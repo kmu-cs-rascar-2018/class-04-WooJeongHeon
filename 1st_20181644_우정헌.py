@@ -90,6 +90,9 @@ class Car(object):
         self.assignment_selfDriving(25, 70)
         self.assignment_selfDriving(25, 70)
 
+        # 모든 과제 완료 후 자동차 주차 함수 호출
+        self.drive_parking()
+
     def moduleInitialize(self):
         try:
             # ================================================================
