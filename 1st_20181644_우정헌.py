@@ -43,103 +43,60 @@ GPIO.setwarnings(False)
 class Car(object):
 
     def __init__(self):
-        self.moduleInitialize()
+        pass
 
     def drive_parking(self):
         # front wheels center allignment
-        self.front_steering.turn_straight()
+        front_steering = front_wheels.Front_Wheels(db='config')
+        front_steering.turn_straight()
 
         # power down both wheels
-        self.rear_wheels_drive.stop()
-        self.rear_wheels_drive.power_down()
+        rear_wheels_drive = rear_wheels.Rear_Wheels(db='config')
+        rear_wheels_drive.stop()
+        rear_wheels_drive.power_down()
 
     # =======================================================================
     # 1ST_ASSIGNMENT_CODE
     # Complete the code to perform First Assignment
     # =======================================================================
     def assignment_selfDriving(self, distanceSet, speedSet):
-        self.rear_wheels_drive.forward_with_speed(speedSet)
+        rear_wheels_drive = rear_wheels.Rear_Wheels(db='config')
+        print("%d의 속도로 전진합니다." % speedSet)
+        rear_wheels_drive.forward_with_speed(speedSet)
+        distance_detector = Ultrasonic_Sensor.Ultrasonic_Avoidance(35)
+        distance = distance_detector.get_distance()
         while True:
-            if self.distance <= distanceSet:
+
+            if distance == -1:
+                continue
+
+            elif distance <= distanceSet:
                 print("전방 %dcm 장애물 감지!!" % distanceSet)
-                self.rear_wheels_drive.stop()
+                rear_wheels_drive.stop()
                 print("4초간 %d의 속도로 후진합니다." % speedSet)
-                self.rear_wheels_drive.backward_with_speed(speedSet)
+                rear_wheels_drive.backward_with_speed(speedSet)
                 time.sleep(4)
-                self.rear_wheels_drive.stop()
+                rear_wheels_drive.stop()
                 break
 
     def assignment_main(self):
         # Implement the assignment code here.
         # OK
-        self.distance = self.distance_detector.get_distance()
-        self.front_steering.turn_straight()
 
-        # 30의 속도로 전진, 장애물 앞 15cm 에서 정지 후 4초간 30의 속도로 후진, 3번 반복
-        self.assignment_selfDriving(15, 30)
-        self.assignment_selfDriving(15, 30)
+        front_steering = front_wheels.Front_Wheels(db='config')
+        front_steering.turn_straight()
+
+        # 30의 속도로 전진, 장애물 앞 15cm 에서 정지 후 4초간 30의 속도로 후진
         self.assignment_selfDriving(15, 30)
 
-        # 50의 속도로 전진, 장애물 앞 20cm 에서 정지 후 4초간 50의 속도로 후진, 3번 반복
-        self.assignment_selfDriving(20, 50)
-        self.assignment_selfDriving(20, 50)
+        # 50의 속도로 전진, 장애물 앞 20cm 에서 정지 후 4초간 50의 속도로 후진
         self.assignment_selfDriving(20, 50)
 
-        # 70의 속도로 전진, 장애물 앞 25cm 에서 정지 후 4초간 70의 속도로 후진, 3번 반복
-        self.assignment_selfDriving(25, 70)
-        self.assignment_selfDriving(25, 70)
+        # 70의 속도로 전진, 장애물 앞 25cm 에서 정지 후 4초간 70의 속도로 후진
         self.assignment_selfDriving(25, 70)
 
         # 모든 과제 완료 후 자동차 주차 함수 호출
         self.drive_parking()
-
-    def moduleInitialize(self):
-        try:
-            # ================================================================
-            # ULTRASONIC MODULE DRIVER INITIALIZE
-            # ================================================================
-            self.distance_detector = Ultrasonic_Sensor.Ultrasonic_Avoidance(35)
-
-            # ================================================================
-            # TRACKING MODULE DRIVER INITIALIZE
-            # ================================================================
-            self.line_detector = Tracking_Sensor.SEN040134_Tracking([16, 18, 22, 40, 32])
-
-            # ================================================================
-            # RGB MODULE DRIVER INITIALIZE
-            # ================================================================
-            self.color_getter = RGB_Sensor.TCS34725()
-
-            # ================================================================
-            # FRONT WHEEL DRIVER SETUP
-            # ================================================================
-            self.front_steering = front_wheels.Front_Wheels(db='config')
-            self.front_steering.ready()
-
-            # ================================================================
-            # REAR WHEEL DRIVER SETUP
-            # ================================================================
-            self.rear_wheels_drive = rear_wheels.Rear_Wheels(db='config')
-            self.rear_wheels_drive.ready()
-
-            # ================================================================
-            # SET LIMIT OF TURNING DEGREE
-            # ===============================================================
-            self.front_steering.turning_max = 35
-
-            # ================================================================
-            # SET FRONT WHEEL CENTOR ALLIGNMENT
-            # ================================================================
-            self.front_steering.turn_straight()
-
-            # ================================================================
-            # DISABLE RGB MODULE INTERRUPTION
-            # ================================================================
-            self.color_getter.set_interrupt(False)
-
-        except:
-            print("MODULE INITIALIZE ERROR")
-            print("CONTACT TO Kookmin Univ. Teaching Assistant")
 
 
 if __name__ == "__main__":
