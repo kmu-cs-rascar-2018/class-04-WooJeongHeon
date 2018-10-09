@@ -43,60 +43,76 @@ GPIO.setwarnings(False)
 class Car(object):
 
     def __init__(self):
-        pass
+        self.moduleInitialize()
 
     def drive_parking(self):
         # front wheels center allignment
-        front_steering = front_wheels.Front_Wheels(db='config')
-        front_steering.turn_straight()
+        self.front_steering.turn_straight()
 
         # power down both wheels
-        rear_wheels_drive = rear_wheels.Rear_Wheels(db='config')
-        rear_wheels_drive.stop()
-        rear_wheels_drive.power_down()
+        self.rear_wheels_drive.stop()
+        self.rear_wheels_drive.power_down()
 
     # =======================================================================
     # 1ST_ASSIGNMENT_CODE
     # Complete the code to perform First Assignment
     # =======================================================================
     def assignment_selfDriving(self, distanceSet, speedSet):
-        rear_wheels_drive = rear_wheels.Rear_Wheels(db='config')
         print("%d의 속도로 전진합니다." % speedSet)
-        rear_wheels_drive.forward_with_speed(speedSet)
-        distance_detector = Ultrasonic_Sensor.Ultrasonic_Avoidance(35)
-        distance = distance_detector.get_distance()
+        self.rear_wheels_drive.forward_with_speed(speedSet)
         while True:
+            distance = self.distance_detector.get_distance()
 
+            # 초음파 센서 오류시 거리 재측정
             if distance == -1:
+                print("일시적인 초음파센서 오류로 인하여 거리를 다시 측정합니다.")
                 continue
 
             elif distance <= distanceSet:
-                print("전방 %dcm 장애물 감지!!" % distanceSet)
-                rear_wheels_drive.stop()
+                self.rear_wheels_drive.stop()
+                print("전방 %dcm이내 장애물 감지!!" % distanceSet)
                 print("4초간 %d의 속도로 후진합니다." % speedSet)
-                rear_wheels_drive.backward_with_speed(speedSet)
+                self.rear_wheels_drive.backward_with_speed(speedSet)
                 time.sleep(4)
-                rear_wheels_drive.stop()
+                self.rear_wheels_drive.stop()
                 break
 
     def assignment_main(self):
         # Implement the assignment code here.
-        # OK
+        # OK!!
 
-        front_steering = front_wheels.Front_Wheels(db='config')
-        front_steering.turn_straight()
+        self.front_steering.turn_straight()
 
         # 30의 속도로 전진, 장애물 앞 15cm 에서 정지 후 4초간 30의 속도로 후진
+        print("\n---<첫번째 미션 시작>---")
         self.assignment_selfDriving(15, 30)
 
         # 50의 속도로 전진, 장애물 앞 20cm 에서 정지 후 4초간 50의 속도로 후진
+        print("\n---<두번째 미션 시작>---")
         self.assignment_selfDriving(20, 50)
 
         # 70의 속도로 전진, 장애물 앞 25cm 에서 정지 후 4초간 70의 속도로 후진
+        print("\n---<세번째 미션 시작>---")
         self.assignment_selfDriving(25, 70)
 
         # 모든 과제 완료 후 자동차 주차 함수 호출
         self.drive_parking()
+        print("\n1차 과제 완료!!")
+
+    def moduleInitialize(self):
+        try:
+            self.distance_detector = Ultrasonic_Sensor.Ultrasonic_Avoidance(35)
+
+            self.front_steering = front_wheels.Front_Wheels(db='config')
+            self.front_steering.ready()
+            self.front_steering.turn_straight()
+
+            self.rear_wheels_drive = rear_wheels.Rear_Wheels(db='config')
+            self.rear_wheels_drive.ready()
+
+        except:
+            print("moduleInitialize ERROR")
+            self.drive_parking()
 
 
 if __name__ == "__main__":
@@ -108,3 +124,4 @@ if __name__ == "__main__":
         # when the Ctrl+C key has been pressed,
         # the moving object will be stopped
         car.drive_parking()
+        print("성공적으로 종료 하였습니다!!")
