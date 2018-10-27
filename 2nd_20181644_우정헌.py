@@ -70,11 +70,14 @@ class myCar(object):
 
             self.car.steering.turn(90 + step_turn)
 
-            # possible error
+            # <테스트 코드>
+            # 라인의 위치가 바뀐 경우 위치를 측정해 출력
+            #  self.car.line_detector.read_digital()를 새로 불러오기 때문에 주행중 시간 오차로 인해 값이 달라질 가능성도 (very little) 있음.
             if step_turn != previous_step_turn:
                 print("Position of line: ", self.car.line_detector.read_digital())
                 previous_step_turn = step_turn
 
+                # if문과 elif문에서 정의되지 않은 경우
                 if step_turn == -1:
                     print("정의되지 않은 경우이므로 재측정 합니다. >>", self.car.line_detector.read_digital())
 
