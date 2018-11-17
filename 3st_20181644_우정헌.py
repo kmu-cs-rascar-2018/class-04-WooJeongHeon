@@ -25,13 +25,10 @@ class myCar(object):
         # 변수 초기화
         self.previous_step_turn = -2
 
+        self.count_echo = 0
+
     def drive_parking(self):
         self.car.drive_parking()
-
-    def stop_and_forward(self, stop_sec, forward_speed):
-        self.car.accelerator.stop
-        time.sleep(stop_sec)
-        self.car.accelerator.go_forward(forward_speed)
 
     def find_abstacle(self, distanceSet):
 
@@ -46,7 +43,6 @@ class myCar(object):
         elif distance <= distanceSet:
             if distance <= distanceSet:
                 if distance <= distanceSet:
-                    self.stop_and_forward(1, 30)
                     if distance <= distanceSet:
                         return True
             return False
@@ -60,12 +56,10 @@ class myCar(object):
 
     def line_tracing(self):
 
-
-
         # while True:
 
         # 뒷바퀴 40의 속도로 직진
-        self.car.accelerator.go_forward(30)
+        self.car.accelerator.go_forward(35)
 
         # 검은 라인의 위치를 측정하고 그에 따른 조향 각도를 step_turn 변수로 받습니다.
         if self.car.line_detector.is_equal_status([0, 0, 1, 0, 0]) or self.car.line_detector.is_equal_status(
@@ -105,9 +99,8 @@ class myCar(object):
         elif self.car.line_detector.is_equal_status([1, 1, 1, 1, 1]):
             step_turn = 1 - 1
             print()
-            print("1111111111111111111111111")
+            print("1111111111111111111111111이 찍혔어요.")
             print()
-
 
         else:
             step_turn = -1
@@ -116,57 +109,54 @@ class myCar(object):
 
         self.previous_step_turn = step_turn
 
+    def line_test(self):
+        while True:
+            self.line_tracing()
+
     def car_startup(self):
         while True:
 
-            print("while문에 들어왔어용!!")
-
-            if self.find_abstacle(25):
+            print("무한루프에 들어왔어용!!")
+            if self.find_abstacle(30):
                 print()
                 print("앗 장애물이닷!!")
+
+                self.count_echo += 1
+
                 step_turn = self.LARGE_STEP_TURN * (-1)
                 self.car.steering.turn(90 + step_turn)
                 time.sleep(1.5)
                 print("바퀴 왼쪽으로 꺾음")
 
+                self.car.steering.turn(90)
+                time.sleep(0.7)
+                print("go straight")
+
+                step_turn = self.LARGE_STEP_TURN
+                self.car.steering.turn(90 + step_turn)
+                time.sleep(2)
+                print("바퀴 오른쪽으로 꺾음")
+
                 while not self.car.line_detector.is_in_line():
-                    time.sleep(0.1)
-                    print("sleep 0.5sec")
-
-                # 가이드라인 통과할 때
-                while self.car.line_detector.is_in_line():
-                    self.stop_and_forward(1, 30)
-                    self.line_tracing()
-                    print("가이드 라인 위에서 주행중")
-                else:
-                    step_turn = self.LARGE_STEP_TURN
-                    self.car.steering.turn(90 + step_turn)
-                    print("가이드라인을 벗어납니다.")
-                    while not self.car.line_detector.is_in_line():
-                        print("가이드라인에서 벗어나 트랙으로 복귀하는중")
-                        time.sleep(0.5)
-                    if self.car.line_detector.is_in_line():
-                        print("트랙 복귀 완료")
-                        self.stop_and_forward(1, 30)
-                        self.line_tracing()
-
-
-
-
+                    time.sleep(0.2)
+                    print("sleep 0.2sec")
 
             else:
                 print("트랙에서 정상적으로 주행중")
                 self.line_tracing()
+
+                if self.count_echo == 4 and self.car.line_detector.is_equal_status([1, 1, 1, 1, 1]):
+                    self.drive_parking()
+                    print("success stop")
+                    break
 
 
 if __name__ == "__main__":
 
     try:
         myCar = myCar("CarName")
+        # myCar.line_test()
         myCar.car_startup()
-
-
-
 
 
     except KeyboardInterrupt:
