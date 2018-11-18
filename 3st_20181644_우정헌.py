@@ -89,7 +89,7 @@ class myCar(object):
             print("00000이 감지되었습니다!!")
             self.car.accelerator.go_backward(35)
             step_turn = self.previous_step_turn * (-1)
-            # self.car.steering.turn(90 + step_turn)
+            self.car.steering.turn(90 + step_turn)
             print("0.5초간 후진합니다.")
             time.sleep(0.5)
 
@@ -107,7 +107,7 @@ class myCar(object):
         # --<테스트 코드>--
         # 라인의 위치가 바뀐 경우 위치를 측정해 출력
         #  self.car.line_detector.read_digital()를 새로 불러오기 때문에 주행중 시간 오차로 인해 값이 달라질 가능성도 (very little) 있음.
-        if previous_step_turn != step_turn:
+        if self.previous_step_turn != step_turn:
             print("Position of line: ", self.car.line_detector.read_digital())
             self.previous_step_turn = step_turn
 
