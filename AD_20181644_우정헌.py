@@ -217,6 +217,7 @@ class myCar(object):
 
             before_input = button_input
 
+            
     def car_startup(self):
         self.Detect_obstacle_thread.start()
         self.Detect_line_thread.start()
@@ -238,6 +239,188 @@ class myCar(object):
             elif self.button_pressed_time >= 2:
                 print("키보드 입력 모듈")
                 self.button_pressed_time = 0
+                
+                
+                
+    def RGBsensor_Tparking_test(self):
+
+        led_pinR = 37
+        button_pin = 33
+        GPIO.setup(led_pinR, GPIO.OUT)
+        GPIO.setup(button_pin, GPIO.IN)
+        pwm = GPIO.PWM(led_pinR, 100)
+        button_input = GPIO.input(button_pin)
+        start_sign = 0
+        
+        while True:
+            button_input = GPIO.input(button_pin)
+            if button_input == 1:
+                continue
+            else:
+                button_input = 1
+                break
+                
+        count = 0
+        countt = 0
+        counttt = 0
+        
+        while (True):
+            rawData = self.car.color_getter.get_raw_data()
+            distance = self.car.distance_detector.get_distance()
+            if rawData[0] > 250:
+                print("Red")
+                self.car.accelerator.stop()
+                time.sleep(1)
+                
+                while True:
+                    button_input = GPIO.input(button_pin)
+                    
+                    if button_input == 1:
+                        continue
+                    else:
+                        button_input = 1
+                        break
+                        
+            if distance <= 30 and distance != -1:
+                count += 1
+                
+            if count >= 10:
+                countt += 1
+                print("aa")
+                pwm.start(50)
+                self.car.accelerator.stop()
+                self.car.steering.turn(60)
+                self.car.accelerator.go_forward(50)
+                time.sleep(0.4)
+                while (True):
+                    if self.car.line_detector.read_digital() == [1, 0, 0, 0, 0] 
+                                or self.car.line_detector.read_digital() == [1, 1, 0, 0, 0]:
+                        self.car.accelerator.stop()
+                        time.sleep(0.1)
+                        self.car.accelerator.go_backward(50)
+                        time.sleep(0.4)
+                        self.car.steering.turn(120)
+                        self.car.accelerator.go_forward(50)
+                        time.sleep(1)
+                        break
+                    else:
+                        pass
+
+                while (True):
+                    if self.car.line_detector.read_digital() == [0, 0, 1, 0, 0] 
+                                    or self.car.line_detector.read_digital() == [1, 1,1, 0,0] 
+                                    or self.car.line_detector.read_digital() == [0, 1, 1, 0, 0]:
+                        self.car.steering.turn(90)
+                        self.car.accelerator.stop()
+                        self.car.accelerator.go_backward(30)
+                        time.sleep(0.05)
+                        count = 0
+                        pwm.stop()
+                        break
+                    else:
+                        pass
+                count = 0
+            self.car.accelerator.go_forward(40)
+            
+            if (self.car.line_detector.read_digital() == [0, 0, 1, 0, 0]):
+                continue
+            elif (self.car.line_detector.read_digital() == [0, 1, 1, 0, 0]):
+                self.car.steering.turn(80)
+
+            elif (self.car.line_detector.read_digital() == [0, 1, 0, 0, 0]):
+                self.car.steering.turn(75)
+
+            elif (self.car.line_detector.read_digital() == [1, 1, 0, 0, 0]):
+                self.car.steering.turn(50)
+
+            elif (self.car.line_detector.read_digital() == [1, 0, 0, 0, 0]):
+                self.car.steering.turn(45)
+
+            elif (self.car.line_detector.read_digital() == [0, 0, 1, 1, 0]):
+                self.car.steering.turn(95)
+
+            elif (self.car.line_detector.read_digital() == [0, 0, 0, 1, 0]):
+                self.car.steering.turn(100)
+
+            elif (self.car.line_detector.read_digital() == [0, 0, 0, 1, 1]):
+                self.car.steering.turn(120)
+
+            elif (self.car.line_detector.read_digital() == [0, 0, 0, 0, 1]):
+                self.car.steering.turn(125)
+
+            elif (self.car.line_detector.read_digital() == [0, 0, 0, 0, 0]):
+                self.car.accelerator.stop()
+                self.car.steering.turn(120)
+                self.car.accelerator.go_backward(30)
+                
+                while (True):
+                    # print(self.car.line_detector.read_digital())
+                    if (self.car.line_detector.read_digital() == [0, 0, 0, 1, 1] 
+                                    or self.car.line_detector.read_digital() == [0, 0, 0, 0, 1] 
+                                    or self.car.line_detector.read_digital() == [0, 0, 1, 1, 0]):
+                        break
+                    else:
+                        continue
+                self.car.accelerator.stop()
+                self.car.steering.turn(70)
+                self.car.accelerator.go_forward(25)
+                while (True):
+                    # print(self.car.line_detector.read_digital())
+                    if (self.car.line_detector.read_digital() == [1, 1, 0, 0, 0] 
+                                    or self.car.line_detector.read_digital() == [1, 0, 0, 0, 0] 
+                                    or self.car.line_detector.read_digital() == [0, 1, 1, 0, 0] 
+                                    or self.car.line_detector.read_digital() == [0, 0, 1, 0, 0] 
+                                    or self.car.line_detector.read_digital() == [0, 0, 1, 1, 0]):
+                        break
+                    else:
+                        continue
+                self.car.accelerator.go_forward(85)
+                time.sleep(0.1)
+            elif (self.car.line_detector.read_digital() == [1, 1, 1, 1, 1]):
+                if countt >= 1:
+                    self.car.accelerator.stop()
+                    time.sleep(1)
+                    self.car.accelerator.go_backward(20)
+                    time.sleep(0.3)
+                    print(countt)
+                    break
+            elif (self.car.line_detector.read_digital() == [1, 1, 1, 0, 0]):
+                print("bb")
+
+                if counttt == 0:
+                    self.car.accelerator.stop()
+                    time.sleep(1)
+                    self.car.steering.turn(80)
+                    self.car.accelerator.go_forward(40)
+                    time.sleep(0.3)
+                    self.car.steering.turn(120)
+                    self.car.accelerator.go_forward(40)
+                    time.sleep(1)
+                    self.car.steering.turn(65)
+                    self.car.accelerator.go_backward(40)
+                    time.sleep(1.7)
+                    self.car.steering.turn(90)
+                    self.car.accelerator.go_backward(50)
+                    time.sleep(0.4)
+                    self.car.steering.turn(90)
+                    self.car.accelerator.go_forward(50)
+                    time.sleep(0.4)
+                    self.car.steering.turn(60)
+                    self.car.accelerator.go_forward(40)
+                    time.sleep(1.3)
+                    self.car.steering.turn(120)
+                    self.car.accelerator.go_backward(40)
+                    time.sleep(1.5)
+                    self.car.accelerator.stop()
+                    time.sleep(1)
+                    counttt += 1
+                elif counttt >= 1:
+                    continue
+                    
+                self.car.accelerator.go_forward(50)
+
+        self.car.accelerator.stop()
+        time.sleep(1)
 
 
 if __name__ == "__main__":
