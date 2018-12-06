@@ -232,52 +232,7 @@ finally:
 
 
     
-    # def Drive(self):
-
-    def Measure_time(self):
-        before_input = 1
-        button_on_time = 0
-        while True:
-            button_input = GPIO.input(self.button_pin)
-
-            if (button_input != before_input):
-                print(button_input)
-                if button_input == 0:
-                    button_on_time = time.time()
-                elif button_input == 1:
-                    button_off_time = time.time() - button_on_time
-                    self.button_pressed_time = button_off_time
-                    print("time:", self.button_pressed_time)
-
-            before_input = button_input
-
-            
-    def car_startup(self):
-        self.Detect_obstacle_thread.start()
-        self.Detect_line_thread.start()
-        self.Measure_time_thread.start()
-        self.LED_module_thread.start()
-
-        while True:
-            if 0 < self.button_pressed_time < 2:
-                if self.drive_start:
-                    # self.car.drive_parking()
-                    print("Button: stop")
-                    self.drive_start = False
-                    self.button_pressed_time = 0
-                elif not self.drive_start:
-                    # self.Drive()
-                    print("Button: start")
-                    self.drive_start = True
-                    self.button_pressed_time = 0
-            elif self.button_pressed_time >= 2:
-                print("키보드 입력 모듈")
-                self.button_pressed_time = 0
-                
-                
-                
-    def RGBsensor_Tparking_test(self):
-
+    def Drive(self):
         led_pinR = 37
         button_pin = 33
         GPIO.setup(led_pinR, GPIO.OUT)
@@ -285,7 +240,6 @@ finally:
         pwm = GPIO.PWM(led_pinR, 100)
         button_input = GPIO.input(button_pin)
         start_sign = 0
-        
         while True:
             button_input = GPIO.input(button_pin)
             if button_input == 1:
@@ -293,11 +247,9 @@ finally:
             else:
                 button_input = 1
                 break
-                
         count = 0
         countt = 0
         counttt = 0
-        
         while (True):
             rawData = self.car.color_getter.get_raw_data()
             distance = self.car.distance_detector.get_distance()
@@ -305,19 +257,15 @@ finally:
                 print("Red")
                 self.car.accelerator.stop()
                 time.sleep(1)
-                
                 while True:
                     button_input = GPIO.input(button_pin)
-                    
                     if button_input == 1:
                         continue
                     else:
                         button_input = 1
                         break
-                        
             if distance <= 30 and distance != -1:
                 count += 1
-                
             if count >= 10:
                 countt += 1
                 print("aa")
@@ -327,8 +275,8 @@ finally:
                 self.car.accelerator.go_forward(50)
                 time.sleep(0.4)
                 while (True):
-                    if self.car.line_detector.read_digital() == [1, 0, 0, 0, 0] 
-                                or self.car.line_detector.read_digital() == [1, 1, 0, 0, 0]:
+                    if self.car.line_detector.read_digital() == [1, 0, 0, 0,0]
+                    or self.car.line_detector.read_digital() == [1, 1, 0, 0, 0]:
                         self.car.accelerator.stop()
                         time.sleep(0.1)
                         self.car.accelerator.go_backward(50)
@@ -342,8 +290,8 @@ finally:
 
                 while (True):
                     if self.car.line_detector.read_digital() == [0, 0, 1, 0, 0] 
-                                    or self.car.line_detector.read_digital() == [1, 1,1, 0,0] 
-                                    or self.car.line_detector.read_digital() == [0, 1, 1, 0, 0]:
+                    or self.car.line_detector.read_digital() == [1, 1, 1, 0, 0]
+                    or self.car.line_detector.read_digital() == [0, 1, 1, 0, 0]:
                         self.car.steering.turn(90)
                         self.car.accelerator.stop()
                         self.car.accelerator.go_backward(30)
@@ -355,7 +303,6 @@ finally:
                         pass
                 count = 0
             self.car.accelerator.go_forward(40)
-            
             if (self.car.line_detector.read_digital() == [0, 0, 1, 0, 0]):
                 continue
             elif (self.car.line_detector.read_digital() == [0, 1, 1, 0, 0]):
@@ -386,12 +333,11 @@ finally:
                 self.car.accelerator.stop()
                 self.car.steering.turn(120)
                 self.car.accelerator.go_backward(30)
-                
                 while (True):
                     # print(self.car.line_detector.read_digital())
-                    if (self.car.line_detector.read_digital() == [0, 0, 0, 1, 1] 
-                                    or self.car.line_detector.read_digital() == [0, 0, 0, 0, 1] 
-                                    or self.car.line_detector.read_digital() == [0, 0, 1, 1, 0]):
+                    if (self.car.line_detector.read_digital() == [0, 0, 0, 1,
+                                                                  1] or self.car.line_detector.read_digital() == [0, 0, 0, 0, 1] or self.car.line_detector.read_digital() == [
+                        0, 0, 1, 1, 0]):
                         break
                     else:
                         continue
@@ -400,11 +346,11 @@ finally:
                 self.car.accelerator.go_forward(25)
                 while (True):
                     # print(self.car.line_detector.read_digital())
-                    if (self.car.line_detector.read_digital() == [1, 1, 0, 0, 0] 
-                                    or self.car.line_detector.read_digital() == [1, 0, 0, 0, 0] 
-                                    or self.car.line_detector.read_digital() == [0, 1, 1, 0, 0] 
-                                    or self.car.line_detector.read_digital() == [0, 0, 1, 0, 0] 
-                                    or self.car.line_detector.read_digital() == [0, 0, 1, 1, 0]):
+                    if (self.car.line_detector.read_digital() == [1, 1, 0, 0,0]
+                        or self.car.line_detector.read_digital() == [1,0,0, 0,0] 
+                        or self.car.line_detector.read_digital() == [ 0, 1, 1, 0, 0] 
+                        or self.car.line_detector.read_digital() == [0, 0, 1, 0,  0] 
+                        or self.car.line_detector.read_digital() == [ 0, 0, 1, 1, 0]):
                         break
                     else:
                         continue
@@ -450,19 +396,62 @@ finally:
                     counttt += 1
                 elif counttt >= 1:
                     continue
-                    
+
+                # while True:
+                #    button_input = GPIO.input(button_pin)
+                #    if button_input == 1:
+                #        continue
+                #    else:
+                #        button_input = 1
+                #        break
                 self.car.accelerator.go_forward(50)
 
         self.car.accelerator.stop()
         time.sleep(1)
 
+    def Measure_time(self):
+        before_input = 1
+        button_on_time = 0
+        while True:
+            button_input = GPIO.input(self.button_pin)
 
-if __name__ == "__main__":
-    try:
-        myCar = myCar("CarName")
-        myCar.car_startup()
+            if (button_input != before_input):
+                print(button_input)
+                if button_input == 0:
+                    button_on_time = time.time()
+                elif button_input == 1:
+                    button_off_time = time.time() - button_on_time
+                    self.button_pressed_time = button_off_time
+                    print("time:", self.button_pressed_time)
 
-    except KeyboardInterrupt:
-        # when the Ctrl+C key has been pressed,
-        # the moving object will be stopped
-        myCar.drive_parking()
+            before_input = button_input
+
+            
+    def car_startup(self):
+        self.Detect_obstacle_thread.start()
+        self.Detect_line_thread.start()
+        self.Measure_time_thread.start()
+        self.LED_module_thread.start()
+
+        while True:
+            if 0 < self.button_pressed_time < 2:
+                if self.drive_start:
+                    # self.car.drive_parking()
+                    print("Button: stop")
+                    self.drive_start = False
+                    self.button_pressed_time = 0
+                elif not self.drive_start:
+                    # self.Drive()
+                    print("Button: start")
+                    self.drive_start = True
+                    self.button_pressed_time = 0
+            elif self.button_pressed_time >= 2:
+                print("키보드 입력 모듈")
+                self.button_pressed_time = 0
+                
+                
+                
+#     def RGBsensor_Tparking_test(self):
+
+           
+       
