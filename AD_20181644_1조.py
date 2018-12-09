@@ -114,30 +114,30 @@ class myCar(object):
                 return 0
 
     def LED_moudle(self):
-            while True:
+        while True:
 
-                self.distance = self.car.distance_detector.get_distance()
-                print(self.distance)
+            self.distance = self.car.distance_detector.get_distance()
+            print(self.distance)
 
-                if 5 < self.distance < 30:
-                    # self.buzzer.obstacle_sound()
-                    count = 0
-                    while count <= 2:
-                        print("LED: Detect Obstacle")
-                        GPIO.output(self.led_pin, True)
-                        time.sleep(0.5)
-                        GPIO.output(self.led_pin, False)
-                        time.sleep(0.5)
-                        count += 1
-
-                elif not self.drive_start:
-                    print("LED: Car Stop")
+            if 5 < self.distance < 30:
+                # self.buzzer.obstacle_sound()
+                count = 0
+                while count <= 2:
+                    print("LED: Detect Obstacle")
                     GPIO.output(self.led_pin, True)
-                """elif self.drive_start:
-                    print("LED: Car Start")
-                    self.LED_PWM()"""
+                    time.sleep(0.5)
+                    GPIO.output(self.led_pin, False)
+                    time.sleep(0.5)
+                    count += 1
 
-                time.sleep(0.1)
+            elif not self.drive_start:
+                print("LED: Car Stop")
+                GPIO.output(self.led_pin, True)
+            """elif self.drive_start:
+                print("LED: Car Start")
+                self.LED_PWM()"""
+
+            time.sleep(0.1)
 
     def Drive(self):
         count = 0
@@ -145,12 +145,14 @@ class myCar(object):
         counttt = 0
         while True:
             rawData = self.car.color_getter.get_raw_data()
-            if rawData[0] > 250:
+            if 300 < rawData[0] < 350 and 50 < rawData[1] < 100 and 50 < rawData[2] < 100:
                 print("Red")
+                self.buzzer.danger_sound()
                 self.car.accelerator.stop()
                 time.sleep(1)
                 while True:
-                    if rawData[1] > 250:
+                    rawData = self.car.color_getter.get_raw_data()
+                    if 350 < rawData[1] < 500 and 50 < rawData[0] < 200 and 150 < rawData[2] < 300:
                         print("Green")
                         self.car.accelerator.go_forward(50)
                         break
@@ -160,7 +162,7 @@ class myCar(object):
 
             if 0 < self.distance <= 30:
                 count += 1
-            if count >= 3:
+            if count >= 10:
                 countt += 1
                 print("distance detected")
                 self.car.accelerator.stop()
@@ -183,7 +185,7 @@ class myCar(object):
 
                 while True:
                     self.line = self.car.line_detector.read_digital()
-                    if self.line == [0, 0, 1, 0, 0] or self.line == [1, 1,1, 0,0] or self.line == [0, 1, 1, 0, 0]:
+                    if self.line == [0, 0, 1, 0, 0] or self.line == [1, 1, 1, 0, 0] or self.line == [0, 1, 1, 0, 0]:
                         self.car.steering.turn(90)
                         self.car.accelerator.stop()
                         self.car.accelerator.go_backward(30)
@@ -218,7 +220,8 @@ class myCar(object):
                 while True:
                     # print(self.line)
                     self.line = self.car.line_detector.read_digital()
-                    if (self.line == [0, 0, 0, 1,1] or self.line == [0, 0,0, 0,1] or self.line == [0, 0, 1, 1, 0]):
+                    if (self.line == [0, 0, 0, 1, 1] or self.line == [0, 0, 0, 0, 1] or self.line == [0, 0, 1, 1,
+                                                                                                      0]):
                         break
                     else:
                         continue
@@ -228,7 +231,9 @@ class myCar(object):
                 while True:
                     # print(self.line)
                     self.line = self.car.line_detector.read_digital()
-                    if (self.line == [1, 1, 0, 0, 0] or self.line == [1, 0,0, 0,0] or self.line == [0, 1, 1, 0, 0] or self.line == [0, 0, 1, 0,0] or self.line == [0, 0, 1, 1, 0]):
+                    if (self.line == [1, 1, 0, 0, 0] or self.line == [1, 0, 0, 0, 0] or self.line == [0, 1, 1, 0,
+                                                                                                      0] or self.line == [
+                        0, 0, 1, 0, 0] or self.line == [0, 0, 1, 1, 0]):
                         break
                     else:
                         continue
@@ -240,7 +245,9 @@ class myCar(object):
                     time.sleep(1)
                     self.car.accelerator.go_backward(20)
                     time.sleep(0.3)
+                    self.car.accelerator.stop()
                     print(countt)
+                    self.buzzer.cart_rider_win()
                     break
             elif (self.line == [1, 1, 1, 0, 0]):
                 print("T")
@@ -249,7 +256,7 @@ class myCar(object):
                     time.sleep(1)
                     self.car.steering.turn(80)
                     self.car.accelerator.go_forward(40)
-                    time.sleep(0.4)
+                    time.sleep(0.3)
                     self.car.steering.turn(120)
                     self.car.accelerator.go_forward(40)
                     time.sleep(1)
@@ -261,13 +268,13 @@ class myCar(object):
                     time.sleep(0.4)
                     self.car.steering.turn(90)
                     self.car.accelerator.go_forward(50)
-                    time.sleep(0.4)
-                    self.car.steering.turn(60)
+                    time.sleep(0.5)
+                    self.car.steering.turn(65)
                     self.car.accelerator.go_forward(40)
-                    time.sleep(1.3)
+                    time.sleep(1)
                     self.car.steering.turn(120)
                     self.car.accelerator.go_backward(40)
-                    time.sleep(1.5)
+                    time.sleep(1.4)
                     self.car.accelerator.stop()
                     time.sleep(1)
                     counttt += 1
@@ -308,14 +315,14 @@ class myCar(object):
 
                     self.car.drive_parking()
                 if not self.drive_start:
-                    # self.buzzer.cart_rider_countdown()
+                    self.buzzer.cart_rider_countdown()
                     self.Drive()
                     print("Button: start")
                     self.drive_start = True
                     self.button_pressed_time = 0
             elif self.button_pressed_time >= 2:
                 print("키보드 입력 모듈")
-
+                self.buzzer.elise()
                 self.key_input_thread.start()
                 self.key_input2_thread.start()
                 self.key_input3_thread.start()
@@ -323,19 +330,25 @@ class myCar(object):
                 self.key_input5_thread.start()
 
                 while True:
-                    speed = 40
+                    # print(self.key_a, self.key_s, self.key_d, self.key_w, self.key_shift)
+                    speed = 60
                     if self.key_shift == 'shift':
-                        speed = 80
+                        speed = 100
                     if self.key_w == 'w':
                         self.car.accelerator.go_forward(speed)
+                        if self.key_w == 'w' and (self.key_a == '' and self.key_d == ''):
+                            self.car.steering.turn(90)
                     if self.key_s == 's':
                         self.car.accelerator.go_backward(speed)
+                        if self.key_s == 's' and (self.key_a == '' and self.key_d == ''):
+                            self.car.steering.turn(90)
                     if self.key_a == 'a':
-                        self.car.steering(60)
+                        self.car.steering.turn(60)
                     if self.key_d == 'd':
-                        self.car.steering(120)
+                        self.car.steering.turn(120)
                     if self.key_w == '' and self.key_a == '' and self.key_d == '' and self.key_s == '' and self.key_shift == '':
-                        self.car.drive_parking()
+                        self.car.accelerator.stop()
+                        self.car.steering.turn(90)
                     time.sleep(0.1)
 
                 self.button_pressed_time = 0
